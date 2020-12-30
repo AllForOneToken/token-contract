@@ -1,22 +1,22 @@
 const { assert } = require("chai");
 
 const AFOT = artifacts.require("AFOT");
-contract("AFOT", accounts => {
+contract("AFOT", (accounts) => {
   const [owner, ordinary, burner, locker, locked, locked2, timeLocked1, investorLocked1, investorLocked2, investorLocked3] = accounts;
   const BigNumber = web3.BigNumber;
 
-  const timeTravel = async function(seconds) {
+  const timeTravel = async function (seconds) {
     await evmIncreaseTime(seconds);
     await evmMine();
   };
-  const evmIncreaseTime = function(seconds) {
+  const evmIncreaseTime = function (seconds) {
     return new Promise((resolve, reject) => {
       web3.currentProvider.send(
         {
           jsonrpc: "2.0",
           method: "evm_increaseTime",
           params: [seconds], //86,400 is num seconds in day
-          id: new Date().getTime()
+          id: new Date().getTime(),
         },
         (err, result) => {
           if (err) {
@@ -27,14 +27,14 @@ contract("AFOT", accounts => {
       );
     });
   };
-  const evmMine = function() {
+  const evmMine = function () {
     return new Promise((resolve, reject) => {
       web3.currentProvider.send(
         {
           jsonrpc: "2.0",
           method: "evm_mine",
           params: [],
-          id: new Date().getTime()
+          id: new Date().getTime(),
         },
         (err, result) => {
           if (err) {
@@ -46,10 +46,7 @@ contract("AFOT", accounts => {
     });
   };
 
-  require("chai")
-    .use(require("chai-as-promised"))
-    .use(require("chai-bignumber")(BigNumber))
-    .should();
+  require("chai").use(require("chai-as-promised")).use(require("chai-bignumber")(BigNumber)).should();
 
   describe("1. owner  test", () => {
     it("1-1 should put 10,000,000,000 AFOT in the owner account", async () => {
@@ -191,21 +188,21 @@ contract("AFOT", accounts => {
       timeLockedAmount = await afot.getTimeLockedAmount(locked);
       assert.equal(timeLockedAmount, lockedAmount, "time locked amount is different");
       await afot.addTimeLock(locked, lockedAmount + 100, now + 400, {
-        from: locker
+        from: locker,
       });
       timeLockLength = await afot.getTimeLockLength(locked);
       assert.equal(timeLockLength, 2, "time locked: 2 time");
       timeLockedAmount = await afot.getTimeLockedAmount(locked);
       assert.equal(timeLockedAmount, lockedAmount * 2 + 100, "time locked amount is different");
       await afot.addTimeLock(locked, lockedAmount + 200, now + 500, {
-        from: locker
+        from: locker,
       });
       timeLockLength = await afot.getTimeLockLength(locked);
       assert.equal(timeLockLength, 3, "time locked: 3 time");
       timeLockedAmount = await afot.getTimeLockedAmount(locked);
       assert.equal(timeLockedAmount, lockedAmount * 3 + 300, "time locked amount is different");
       await afot.addTimeLock(locked, lockedAmount + 300, now + 600, {
-        from: locker
+        from: locker,
       });
       timeLockLength = await afot.getTimeLockLength(locked);
       assert.equal(timeLockLength, 4, "time locked: 4 time");
@@ -262,7 +259,7 @@ contract("AFOT", accounts => {
       timeLockedAmount = await afot.getTimeLockedAmount(locked);
       assert.equal(timeLockedAmount, lockedAmount + 300, "time locked amount is different");
       await afot.addTimeLock(locked, lockedAmount + 100, now + 400, {
-        from: locker
+        from: locker,
       });
       timeLockLength = await afot.getTimeLockLength(locked);
       assert.equal(timeLockLength, 2, "time locked: 2 time");
@@ -291,7 +288,7 @@ contract("AFOT", accounts => {
       balance = await afot.balanceOf(locked2);
       assert.equal(transferredAmount, balance.valueOf(), "transfer failed");
       await afot.addTimeLock(locked2, lockedAmount * 4 + 100, now + 300, {
-        from: locker
+        from: locker,
       });
       timeLockLength = await afot.getTimeLockLength(locked2);
       assert.equal(timeLockLength, 1, "time locked: 1 time");
@@ -322,7 +319,7 @@ contract("AFOT", accounts => {
       balance = await afot.balanceOf(timeLocked1);
       assert.equal(transferredAmount, balance.valueOf(), "transfer failed");
       await afot.addTimeLock(timeLocked1, lockedAmount * 4 + 100, now + 2, {
-        from: locker
+        from: locker,
       });
       timeLockLength = await afot.getTimeLockLength(timeLocked1);
       assert.equal(timeLockLength, 1, "time locked: 1 time");
@@ -359,7 +356,7 @@ contract("AFOT", accounts => {
       balance = await afot.balanceOf(investorLocked1);
       assert.equal(transferredAmount, balance.valueOf(), "transfer failed");
       await afot.addInvestorLock(investorLocked1, months, {
-        from: locker
+        from: locker,
       });
       investorLockedAmount = await afot.getInvestorLockedAmount(investorLocked1);
       assert.equal(investorLockedAmount, lockedAmount, "investor locked amount is different");
@@ -396,7 +393,7 @@ contract("AFOT", accounts => {
       balance = await afot.balanceOf(investorLocked2);
       assert.equal(transferredAmount, balance.valueOf(), "transfer failed");
       await afot.addInvestorLock(investorLocked2, months, {
-        from: locker
+        from: locker,
       });
       investorLockedAmount = await afot.getInvestorLockedAmount(investorLocked2);
       assert.equal(investorLockedAmount, lockedAmount, "investor locked amount is different");
@@ -423,7 +420,7 @@ contract("AFOT", accounts => {
       balance = await afot.balanceOf(investorLocked3);
       assert.equal(transferredAmount, balance.valueOf(), "transfer failed");
       await afot.addInvestorLock(investorLocked3, months, {
-        from: locker
+        from: locker,
       });
       investorLockedAmount = await afot.getInvestorLockedAmount(investorLocked3);
       assert.equal(investorLockedAmount, lockedAmount, "investor locked amount is different");
@@ -436,7 +433,7 @@ contract("AFOT", accounts => {
       investorLockedAmount = await afot.getInvestorLockedAmount(investorLocked3);
       assert.equal(investorLockedAmount, lockedAmount - releasedAmountPerMonth, "investor locked amount is different");
       await afot.transfer(owner, releasedAmountPerMonth, {
-        from: investorLocked3
+        from: investorLocked3,
       });
       balance = await afot.balanceOf(investorLocked3);
       assert.equal(transferredAmount - releasedAmountPerMonth, balance.valueOf(), "transfer failed");
